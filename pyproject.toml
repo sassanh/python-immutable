@@ -1,0 +1,45 @@
+[tool.poetry]
+name = "python-immutable"
+version = "1.0.0"
+description = "Immutable implementation for Python using dataclasses"
+authors = ["Sassan Haradji <sassanh@gmail.com>"]
+license = "Apache-2.0"
+readme = "README.md"
+packages = [{ include = "immutable" }]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+
+[tool.poetry.scripts]
+demo = "demo:main"
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+poethepoet = "^0.24.3"
+pyright = "^1.1.342"
+ruff = "^0.1.9"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poe.tasks]
+lint = "sh -c 'pyright -p pyproject.toml .; poetry run ruff . --unsafe-fixes'"
+
+[tool.ruff]
+select = ['ALL']
+ignore = []
+
+fixable = ['ALL']
+unfixable = []
+
+[tool.ruff.flake8-quotes]
+docstring-quotes = "double"
+inline-quotes = "single"
+multiline-quotes = "double"
+
+[tool.ruff.format]
+quote-style = 'single'
