@@ -11,7 +11,17 @@ This library provides decorators and base classes to create immutable data class
 
 ## 📦 Installation
 
-Include this library in your Python project by adding the provided file. Use the decorators and classes directly in your scripts.
+### Pip
+
+```bash
+pip install python-immutable
+```
+
+### Poetry
+
+```bash
+poetry add python-immutable
+```
 
 ## 🚀 Usage
 
@@ -20,7 +30,7 @@ Include this library in your Python project by adding the provided file. Use the
 Apply `immutable` to a class to make it immutable and enforce keyword-only arguments.
 
 ```python
-from your_library import immutable
+from immutable import immutable
 
 @immutable
 class MyClass:
@@ -32,7 +42,7 @@ class MyClass:
 Inherit from `Immutable` for similar functionality.
 
 ```python
-from your_library import Immutable
+from immutable import Immutable
 
 class MyClass(Immutable):
     # Fields here

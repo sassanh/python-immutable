@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "python-immutable"
-version = "1.0.0"
+version = "1.0.1"
 description = "Immutable implementation for Python using dataclasses"
 authors = ["Sassan Haradji <sassanh@gmail.com>"]
 license = "Apache-2.0"
