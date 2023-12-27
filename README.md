@@ -2,9 +2,11 @@
 
 ## Overview
 
-This library provides decorators and base classes to create immutable data classes in Python. By enforcing immutability and keyword-only arguments, it enhances the robustness and clarity of your data structures.
+This library provides decorators and base classes to create immutable data classes
+in Python. By enforcing immutability and keyword-only arguments, it enhances the
+robustness and clarity of your data structures.
 
-## ⚡️ Requirements
+## 📋 Requirements
 
 - Python 3.9 or later.
 - No external dependencies are required.
@@ -23,7 +25,7 @@ pip install python-immutable
 poetry add python-immutable
 ```
 
-## 🚀 Usage
+## 🛠 Usage
 
 ### Using `immutable` Decorator
 
@@ -48,7 +50,7 @@ class MyClass(Immutable):
     # Fields here
 ```
 
-## ⚒️ Contribution
+## 🤝 Contributing
 
 Contributions are welcome. Please submit pull requests or issues on the GitHub repository.
 
@@ -56,6 +58,7 @@ Contributions are welcome. Please submit pull requests or issues on the GitHub r
 
 Ensure compatibility with Python 3.9 or newer when contributing.
 
-## 📜 License
+## 🔒 License
 
-This project is released under the Apache-2.0 License. See the LICENSE file for more details.
+This project is released under the Apache-2.0 License. See the [LICENSE](./LICENSE)
+file for more details.

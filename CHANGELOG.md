@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.0.2
+
+- docs: improve `README.md`
+
 ## Version 1.0.1
 
 - docs: add installation instructions for poetry in `README.md`
