@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.0.4
+
+- fix: support Python 3.9
+
 ## Version 1.0.3
 
 - chore: add github actions for linting and type checking
