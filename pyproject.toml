@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "python-immutable"
-version = "1.0.2"
+version = "1.0.3"
 description = "Immutable implementation for Python using dataclasses"
 authors = ["Sassan Haradji <sassanh@gmail.com>"]
 license = "Apache-2.0"
@@ -11,35 +11,42 @@ packages = [{ include = "immutable" }]
 python = "^3.9"
 
 
-[tool.poetry.scripts]
-demo = "demo:main"
-
 [tool.poetry.group.dev]
 optional = true
 
 [tool.poetry.group.dev.dependencies]
 poethepoet = "^0.24.3"
-pyright = "^1.1.342"
-ruff = "^0.1.9"
+pyright = "^1.1.352"
+ruff = "^0.3.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.poetry.scripts]
+demo = "demo:main"
+
 [tool.poe.tasks]
-lint = "sh -c 'pyright -p pyproject.toml .; poetry run ruff . --unsafe-fixes'"
+lint = "ruff check . --unsafe-fixes"
+typecheck = "pyright -p pyproject.toml ."
+sanity = ["typecheck", "lint"]
 
 [tool.ruff]
-select = ['ALL']
-ignore = []
+lint.select = ['ALL']
+lint.ignore = ['INP001', 'PLR0911', 'D203', 'D213']
+lint.fixable = ['ALL']
+lint.unfixable = []
 
-fixable = ['ALL']
-unfixable = []
-
-[tool.ruff.flake8-quotes]
+[tool.ruff.lint.flake8-quotes]
 docstring-quotes = "double"
 inline-quotes = "single"
 multiline-quotes = "double"
 
 [tool.ruff.format]
 quote-style = 'single'
+
+[tool.isort]
+profile = "black"
+
+[tool.pyright]
+exclude = ['typings']

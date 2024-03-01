@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.0.3
+
+- chore: add github actions for linting and type checking
+
 ## Version 1.0.2
 
 - docs: improve `README.md`

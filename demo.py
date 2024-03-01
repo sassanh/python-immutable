@@ -17,14 +17,14 @@ class DecoratedClass:
 def main() -> None:
     first_instance = InheritedClass(field=1)
     try:
-        first_instance.field = 2
+        first_instance.field = 2  # pyright: ignore [reportAttributeAccessIssue]
         raise AssertionError
     except FrozenInstanceError as error:
         assert isinstance(error, FrozenInstanceError)  # noqa: S101, PT017
 
     second_instance = DecoratedClass(field=1)
     try:
-        second_instance.field = 2
+        second_instance.field = 2  # pyright: ignore [reportAttributeAccessIssue]
         raise AssertionError
     except FrozenInstanceError as error:
         assert isinstance(error, FrozenInstanceError)  # noqa: S101, PT017

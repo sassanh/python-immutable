@@ -2,14 +2,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import (
-    Any,
-    Mapping,
-    TypeVar,
-    dataclass_transform,
-)
+from typing import Any, Mapping, TypeVar
 
-_T = TypeVar("_T")
+from typing_extensions import dataclass_transform
+
+_T = TypeVar('_T')
 
 
 @dataclass_transform(kw_only_default=True, frozen_default=True)
