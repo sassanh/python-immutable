@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.0.5
+
+- feat: add `is_immutable` to check whether an object is an instance of `Immutable`
+
 ## Version 1.0.4
 
 - fix: support Python 3.9

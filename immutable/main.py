@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import sys
 from dataclasses import dataclass
-from typing import Any, Mapping, TypeVar
+from typing import Any, Mapping, TypeGuard, TypeVar
 
 from typing_extensions import dataclass_transform
 
@@ -18,6 +18,7 @@ def immutable(cls: type[_T]) -> type[_T]:
 
 
 @dataclass_transform(kw_only_default=True, frozen_default=True)
+@immutable
 class Immutable:
     def __init_subclass__(
         cls: type[Immutable],
@@ -25,3 +26,11 @@ class Immutable:
     ) -> None:
         super().__init_subclass__(**kwargs)
         immutable(cls)
+
+
+def is_immutable(obj: object) -> TypeGuard[Immutable]:
+    return (
+        hasattr(obj, '__dataclass_fields__')
+        and hasattr(obj, '__dataclass_params__')
+        and getattr(getattr(obj, '__dataclass_params__', None), 'frozen', False)
+    )
