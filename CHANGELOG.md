@@ -1,5 +1,13 @@
 # Changelog
 
+## Version 1.1.0
+
+- feat: instanced of subclasses of `Immutable` are now considered equal if they
+  have the same attributes, in the same order, with the same values
+- refactor: the return value of `make_immutable` now passes `issubclass(cls, Immutable)`
+  check and has `__eq__` of `Immutable`
+- test: add tests
+
 ## Version 1.0.6
 
 - feat: add `make_immutable` to be on par with `make_dataclass`

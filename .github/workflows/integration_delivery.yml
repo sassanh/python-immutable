@@ -93,6 +93,57 @@ jobs:
       - name: Lint
         run: poetry run poe lint
 
+  test:
+    name: Test
+    needs:
+      - dependencies
+    runs-on: ubuntu-latest
+    environment:
+      name: test
+      url: https://app.codecov.io/gh/${{ github.repository }}/
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout
+
+      - uses: actions/setup-python@v5
+        name: Setup Python
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          architecture: x64
+
+      - name: Load Cached Poetry
+        uses: actions/cache/restore@v4
+        id: cached-poetry
+        with:
+          path: |
+            ~/.cache
+            ~/.local
+          key: poetry-${{ hashFiles('poetry.lock') }}
+
+      - name: Run Tests
+        run: poetry run poe test
+
+      - name: Collect Store Snapshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: snapshots
+          path: tests/**/results/**/*.jsonc
+
+      - name: Collect HTML Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: htmlcov
+
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          flags: integration
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+
   build:
     name: Build
     needs:
@@ -177,6 +228,7 @@ jobs:
     needs:
       - type-check
       - lint
+      - test
       - build
     runs-on: ubuntu-latest
     environment:
@@ -207,6 +259,7 @@ jobs:
     needs:
       - type-check
       - lint
+      - test
       - build
       - pypi-publish
     runs-on: ubuntu-latest
