@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "python-immutable"
-version = "1.0.5"
+version = "1.0.6"
 description = "Immutable implementation for Python using dataclasses"
 authors = ["Sassan Haradji <sassanh@gmail.com>"]
 license = "Apache-2.0"
@@ -17,8 +17,8 @@ optional = true
 
 [tool.poetry.group.dev.dependencies]
 poethepoet = "^0.24.3"
-pyright = "^1.1.352"
-ruff = "^0.3.0"
+pyright = "^1.1.361"
+ruff = "^0.4.3"
 
 [build-system]
 requires = ["poetry-core"]

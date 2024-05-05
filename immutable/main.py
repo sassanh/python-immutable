@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 import sys
-from dataclasses import dataclass
-from typing import Any, Mapping, TypeGuard, TypeVar
+from dataclasses import dataclass, make_dataclass
+from typing import Any, Iterable, Mapping, TypeGuard, TypeVar
 
 from typing_extensions import dataclass_transform
 
@@ -34,3 +34,11 @@ def is_immutable(obj: object) -> TypeGuard[Immutable]:
         and hasattr(obj, '__dataclass_params__')
         and getattr(getattr(obj, '__dataclass_params__', None), 'frozen', False)
     )
+
+
+@dataclass_transform(kw_only_default=True, frozen_default=True)
+def make_immutable(
+    cls_name: str,
+    fields: Iterable[str | tuple[str, Any] | tuple[str, Any, Any]],
+) -> type:
+    return make_dataclass(cls_name, fields, frozen=True, kw_only=True)

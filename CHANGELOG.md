@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.0.6
+
+- feat: add `make_immutable` to be on par with `make_dataclass`
+
 ## Version 1.0.5
 
 - feat: add `is_immutable` to check whether an object is an instance of `Immutable`
