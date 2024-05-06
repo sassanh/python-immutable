@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 1.1.1
+
+- fix: mark `Immutable` class as a dataclass to avoid `TypeError` when using `dataclasses.replace`,
+  `dataclasses.fields`, etc.
+
 ## Version 1.1.0
 
 - feat: instanced of subclasses of `Immutable` are now considered equal if they

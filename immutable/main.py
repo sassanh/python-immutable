@@ -18,6 +18,7 @@ def immutable(cls: type[_T]) -> type[_T]:
 
 
 @dataclass_transform(kw_only_default=True, frozen_default=True)
+@dataclass(kw_only=True, frozen=True, eq=False, unsafe_hash=True)
 class Immutable:
     def __init_subclass__(
         cls: type[Immutable],
