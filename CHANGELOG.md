@@ -1,6 +1,6 @@
 # Changelog
 
-## Upcoming
+## Version 1.2.0
 
 - chore: replace poetry with uv, make sure python3.9+ is supported and add tests for all supported python versions in github actions
 - feat: add `__call__` method to `Immutable` class to allow replacing attributes with new values, basically a shorthand for `dataclasses.replace`
