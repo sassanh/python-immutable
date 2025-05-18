@@ -2,22 +2,24 @@
 from __future__ import annotations
 
 import sys
-from dataclasses import dataclass, make_dataclass
-from typing import TYPE_CHECKING, Any, TypeVar
+from dataclasses import dataclass, make_dataclass, replace
+from typing import TYPE_CHECKING, Any, Self, TypeVar, cast
 
 from typing_extensions import TypeGuard, dataclass_transform
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
+    from _typeshed import DataclassInstance
+
 _T = TypeVar('_T')
 
-dataclass_kwargs = {'frozen': True, 'eq': False}
+dataclass_kwargs = {'frozen': True, 'eq': False, 'unsafe_hash': True}
 if sys.version_info >= (3, 10):
     dataclass_kwargs = {**dataclass_kwargs, 'kw_only': True}
 
 
-@dataclass_transform(kw_only_default=True, frozen_default=True)
+@dataclass_transform(kw_only_default=True, frozen_default=True, eq_default=False)
 def immutable(cls: type[_T]) -> type[_T]:
     return dataclass(**dataclass_kwargs)(cls)
 
@@ -40,6 +42,9 @@ class Immutable:
             return NotImplemented
         return tuple(self.__dict__.values()) == tuple(other.__dict__.values())
 
+    def __call__(self, **kwrags: object) -> Self:
+        return cast('Self', replace(cast('DataclassInstance', self), **kwrags))
+
 
 class _Immutable(Immutable):
     def __init_subclass__(
@@ -53,7 +58,11 @@ def is_immutable(obj: object) -> TypeGuard[Immutable]:
     return (
         hasattr(obj, '__dataclass_fields__')
         and hasattr(obj, '__dataclass_params__')
-        and getattr(getattr(obj, '__dataclass_params__', None), 'frozen', False)
+        and all(
+            getattr(getattr(obj, '__dataclass_params__', None), key, None)
+            is dataclass_kwargs[key]
+            for key in dataclass_kwargs
+        )
     )
 
 
