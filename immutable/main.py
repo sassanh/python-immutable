@@ -3,22 +3,27 @@ from __future__ import annotations
 
 import sys
 from dataclasses import dataclass, make_dataclass
-from typing import Any, Iterable, TypeGuard, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
-from typing_extensions import dataclass_transform
+from typing_extensions import TypeGuard, dataclass_transform
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 _T = TypeVar('_T')
+
+dataclass_kwargs = {'frozen': True, 'eq': False}
+if sys.version_info >= (3, 10):
+    dataclass_kwargs = {**dataclass_kwargs, 'kw_only': True}
 
 
 @dataclass_transform(kw_only_default=True, frozen_default=True)
 def immutable(cls: type[_T]) -> type[_T]:
-    if sys.version_info < (3, 10):
-        return dataclass(frozen=True)(cls)  # pragma: no cover
-    return dataclass(frozen=True, kw_only=True, eq=False, unsafe_hash=True)(cls)
+    return dataclass(**dataclass_kwargs)(cls)
 
 
 @dataclass_transform(kw_only_default=True, frozen_default=True)
-@dataclass(kw_only=True, frozen=True, eq=False, unsafe_hash=True)
+@dataclass(**dataclass_kwargs)
 class Immutable:
     def __init_subclass__(
         cls: type[Immutable],
@@ -60,7 +65,6 @@ def make_immutable(
     return make_dataclass(
         cls_name,
         fields,
-        frozen=True,
-        kw_only=True,
         bases=(_Immutable,),
+        **dataclass_kwargs,  # pyright: ignore[reportArgumentType]
     )

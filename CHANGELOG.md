@@ -1,5 +1,9 @@
 # Changelog
 
+## Upcoming
+
+- chore: replace poetry with uv, make sure python3.9+ is supported and add tests for all supported python versions in github actions
+
 ## Version 1.1.1
 
 - fix: mark `Immutable` class as a dataclass to avoid `TypeError` when using `dataclasses.replace`,

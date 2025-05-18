@@ -1,3 +1,5 @@
+.DS_Store
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -98,3 +100,6 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# hatch
+immutable/_version.py

@@ -5,99 +5,43 @@ on:
   pull_request:
   workflow_dispatch:
 
-env:
-  PYTHON_VERSION: '3.11'
-
 jobs:
-  dependencies:
-    name: Install Dependencies
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        name: Checkout
-
-      - name: Load Cached Poetry
-        id: cached-poetry
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache
-            ~/.local
-          key: poetry-${{ hashFiles('poetry.lock') }}-${{ env.PYTHON_VERSION}}
-
-      - uses: actions/setup-python@v5
-        name: Setup Python
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          architecture: x64
-
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          virtualenvs-create: true
-
-      - name: Install dependencies
-        run: poetry install --with dev
-
   type-check:
     name: Type Check
-    needs:
-      - dependencies
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         name: Checkout
 
-      - uses: actions/setup-python@v5
-        name: Setup Python
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          architecture: x64
-
-      - name: Load Cached Poetry
-        id: cached-poetry
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            ~/.cache
-            ~/.local
-          key: poetry-${{ hashFiles('poetry.lock') }}-${{ env.PYTHON_VERSION}}
+          enable-cache: true
 
       - name: Type Check
-        run: poetry run poe typecheck
+        run: uv run --frozen poe typecheck
 
   lint:
     name: Lint
-    needs:
-      - dependencies
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         name: Checkout
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          architecture: x64
-
-      - name: Load Cached Poetry
-        id: cached-poetry
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            ~/.cache
-            ~/.local
-          key: poetry-${{ hashFiles('poetry.lock') }}-${{ env.PYTHON_VERSION}}
+          enable-cache: true
 
       - name: Lint
-        run: poetry run poe lint
+        run: uv run --frozen poe lint
 
   test:
     name: Test
-    needs:
-      - dependencies
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
     environment:
       name: test
       url: https://app.codecov.io/gh/${{ github.repository }}/
@@ -105,35 +49,19 @@ jobs:
       - uses: actions/checkout@v4
         name: Checkout
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          architecture: x64
-
-      - name: Load Cached Poetry
-        uses: actions/cache/restore@v4
-        id: cached-poetry
-        with:
-          path: |
-            ~/.cache
-            ~/.local
-          key: poetry-${{ hashFiles('poetry.lock') }}-${{ env.PYTHON_VERSION}}
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
 
       - name: Run Tests
-        run: poetry run poe test
-
-      - name: Collect Store Snapshots
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: snapshots
-          path: tests/**/results/**/*.jsonc
+        run: uv run --frozen poe test
 
       - name: Collect HTML Coverage Report
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
+          name: coverage-report-${{ matrix.python-version }}
           path: htmlcov
 
       - name: Upload Coverage to Codecov
@@ -146,8 +74,6 @@ jobs:
 
   build:
     name: Build
-    needs:
-      - dependencies
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.extract-version.outputs.VERSION }}
@@ -156,54 +82,46 @@ jobs:
       - uses: actions/checkout@v4
         name: Checkout
 
-      - uses: actions/setup-python@v5
-        name: Setup Python
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
-          architecture: x64
-
-      - name: Load Cached Poetry
-        id: cached-poetry
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            ~/.cache
-            ~/.local
-          key: poetry-${{ hashFiles('poetry.lock') }}-${{ env.PYTHON_VERSION}}
+          enable-cache: true
 
       - name: Extract Version
         id: extract-version
         run: |
-          echo "VERSION=$(poetry version --short)" >> "$GITHUB_OUTPUT"
-          echo "VERSION=$(poetry version --short)"
-          echo "NAME=$(poetry version | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
-          echo "NAME=$(poetry version | cut -d' ' -f1)"
+          git fetch --prune --unshallow
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+          echo "VERSION=$(uvx hatch version)" >>"$GITHUB_OUTPUT"
+          echo "VERSION=$(uvx hatch version)"
+          echo "NAME=$(uvx hatch project metadata | jq -r .name)" >>"$GITHUB_OUTPUT"
+          echo "NAME=$(uvx hatch project metadata | jq -r .name)"
 
       - name: Extract Version from CHANGELOG.md
         run: |
-          VERSION_CHANGELOG=$(sed -n '3 s/## Version //p' CHANGELOG.md) 
-          echo "VERSION_CHANGELOG=$VERSION_CHANGELOG"
-          if [ "${{ steps.extract-version.outputs.VERSION }}" != "$VERSION_CHANGELOG" ]; then
-            echo "Error: Version extracted from CHANGELOG.md does not match the version in pyproject.toml"
-            exit 1 
+          FIRST_HEADER=$(sed -n '/## /s/## //p' CHANGELOG.md | head -n 1) 
+          if [ "$FIRST_HEADER" == "Upcoming" ]; then
+            # Check the version coming from extract-version starts with of x.y.z.devn
+            if [[ "${{ steps.extract-version.outputs.VERSION }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.dev[0-9]+ ]]; then
+              VERSION_CHANGELOG="This is a development version."
+            else
+              echo "Error: First header in CHANGELOG.md is 'Upcoming' but the version in pyproject.toml is not a development version."
+              exit 1
+            fi
           else
-            echo "Versions are consistent."
-          fi
-
-      - name: Extract Version from Tag
-        if: startsWith(github.ref, 'refs/tags/v')
-        run: |
-          VERSION_TAG=$(sed 's/^v//' <<< ${{ github.ref_name }})
-          echo "VERSION_TAG=$VERSION_TAG"
-          if [ "${{ steps.extract-version.outputs.VERSION }}" != "$VERSION_TAG" ]; then
-            echo "Error: Version extracted from tag does not match the version in pyproject.toml"
-            exit 1 
-          else
-            echo "Versions are consistent."
+            VERSION_CHANGELOG=$(echo $FIRST_HEADER | sed 's/Version //')
+            if [ "${{ steps.extract-version.outputs.VERSION }}" =~ "^$VERSION_CHANGELOG\.dev[0-9]+" ]; then
+              echo "Error: Version extracted from CHANGELOG.md does not match the version in pyproject.toml"
+              exit 1 
+            else
+              echo "Versions are consistent."
+            fi
           fi
 
       - name: Build
-        run: poetry build
+        run:
+          SETUPTOOLS_SCM_PRETEND_VERSION=${{
+          steps.extract-version.outputs.VERSION }} uv build
 
       - name: Upload wheel
         uses: actions/upload-artifact@v4
@@ -219,10 +137,12 @@ jobs:
           path: dist/*.tar.gz
           if-no-files-found: error
 
-  pypi-publish:
-    name: Publish to PyPI
+  publish:
+    name: Publish
     if: >-
-      github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+      github.event_name == 'push' && (github.ref == 'refs/heads/main' ||
+      startsWith(github.ref, 'refs/tags/v')) || github.event_name ==
+      'pull_request' && github.event.pull_request.base.ref == 'main'
     needs:
       - type-check
       - lint
@@ -231,7 +151,9 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/${{ needs.build.outputs.name }}
+      url:
+        https://pypi.org/project/${{ needs.build.outputs.name }}/${{
+        needs.build.outputs.version }}
     permissions:
       id-token: write
     steps:
@@ -245,11 +167,10 @@ jobs:
           name: binary
           path: dist
 
-      - name: Publish package distributions to PyPI
+      - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist
-          verbose: true
 
   release:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
@@ -259,7 +180,7 @@ jobs:
       - lint
       - test
       - build
-      - pypi-publish
+      - publish
     runs-on: ubuntu-latest
     environment:
       name: release
@@ -269,6 +190,9 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
+        name: Checkout
+
       - name: Procure Wheel
         uses: actions/download-artifact@v4
         with:
@@ -281,18 +205,15 @@ jobs:
           name: binary
           path: artifacts
 
-      - uses: actions/checkout@v4
-        name: Checkout
-
       - name: Extract Changelog
         id: changelog
         run: |
-          perl -0777 -ne 'while (/## Version ${{ needs.build.outputs.version }}\n(\s*\n)*(.*?)(\s*\n)*## Version \d+\.\d+\.\d+\n/sg) {print "$2\n"}' CHANGELOG.md > CURRENT_CHANGELOG.md
+          perl -0777 -ne 'while (/## Version ${{ needs.build.outputs.version }}\n(\s*\n)*(.*?)(\s*\n)*## Version \d+\.\d+\.\d+\n/sg) {print "$2\n"}' CHANGELOG.md >CURRENT_CHANGELOG.md
           {
             echo "CONTENT<<EOF"
             cat CURRENT_CHANGELOG.md
             echo "EOF"
-          } >> "$GITHUB_OUTPUT"
+          } >>"$GITHUB_OUTPUT"
 
       - name: Release
         uses: softprops/action-gh-release@v2

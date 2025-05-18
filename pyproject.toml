@@ -1,31 +1,42 @@
-[tool.poetry]
+[project]
 name = "python-immutable"
-version = "1.1.1"
+dynamic = ["version"]
 description = "Immutable implementation for Python using dataclasses"
-authors = ["Sassan Haradji <sassanh@gmail.com>"]
-license = "Apache-2.0"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Sassan Haradji", email = "me@sassanh.com" }]
+maintainers = [{ name = "Sassan Haradji", email = "me@sassanh.com" }]
 readme = "README.md"
-packages = [{ include = "immutable" }]
-
-[tool.poetry.dependencies]
-python = "^3.9"
-typing-extensions = "^4.10.0"
-
-
-[tool.poetry.group.dev]
-optional = true
-
-[tool.poetry.group.dev.dependencies]
-poethepoet = "^0.24.3"
-pyright = "^1.1.361"
-ruff = "^0.4.3"
-pytest = "^8.2.0"
-pytest-cov = "^5.0.0"
-pytest-timeout = "^2.3.1"
+requires-python = ">=3.9"
+keywords = ['python', 'immutable', 'dataclass', 'frozen', 'typing']
+dependencies = []
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "immutable/_version.py"
+
+[tool.hatch.version.raw-options]
+local_scheme = "setup_scm_schemes:local_scheme"
+
+[tool.hatch.build]
+packages = ["immutable"]
+
+[tool.uv]
+dev-dependencies = [
+  "poethepoet>=0.24.4",
+  "pyright>=1.1.400",
+  "pytest>=8.0.0",
+  "pytest-cov>=4.1.0",
+  "pytest-timeout>=2.3.1",
+  "ruff>=0.11.10",
+  "toml>=0.10.2",
+  "typing-extensions>=4.13.2",
+]
 
 [tool.poetry.scripts]
 demo = "demo:main"
@@ -57,11 +68,11 @@ quote-style = 'single'
 profile = "black"
 
 [tool.pyright]
-exclude = ['typings']
+exclude = ['typings', '.venv']
 filterwarnings = 'error'
 
 [tool.pytest.ini_options]
-log_cli = 1
+log_cli = true
 log_cli_level = 'ERROR'
 timeout = 1
 
@@ -70,3 +81,4 @@ exclude_also = ["if TYPE_CHECKING:"]
 
 [tool.coverage.run]
 source = ['immutable']
+omit = ['immutable/_version.py']
