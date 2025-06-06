@@ -14,22 +14,27 @@ if TYPE_CHECKING:
 
 _T = TypeVar('_T')
 
-# These values should be written explicitly in the dataclass for pyright to recognize
-# them.
-dataclass_decorator = (
-    dataclass(frozen=True, eq=False, unsafe_hash=True, kw_only=True)
-    if sys.version_info >= (3, 10)
-    else dataclass(frozen=True, eq=False, unsafe_hash=True)
-)
-
 
 @dataclass_transform(kw_only_default=True, frozen_default=True, eq_default=False)
 def immutable(cls: type[_T]) -> type[_T]:
+    dataclass_decorator = dataclass(
+        frozen=True,
+        eq=False,
+        unsafe_hash=True,
+        **({'kw_only': True} if sys.version_info >= (3, 10) else {}),
+    )
     return dataclass_decorator(cls)
 
 
 @dataclass_transform(kw_only_default=True, frozen_default=True)
-@dataclass_decorator
+# These values should be written explicitly in the dataclass for pyright to recognize
+# them.
+@dataclass(
+    frozen=True,
+    eq=False,
+    unsafe_hash=True,
+    **({'kw_only': True} if sys.version_info >= (3, 10) else {}),
+)
 class Immutable:
     def __init_subclass__(
         cls: type[Immutable],
