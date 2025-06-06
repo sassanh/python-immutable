@@ -3,6 +3,7 @@
 ## Upcoming
 
 - refactor: make it play nicer with pyright's `reportUnhashable`
+- chore: update setup-uv version in github actions to v6 to support `python-version` parameter
 
 ## Version 1.2.0
 
