@@ -1,5 +1,5 @@
 # ruff: noqa: D100, D101, D102, D103, D104, D107
-from immutable.main import Immutable, immutable
+from immutable import Immutable, immutable
 
 
 def test_subclasses_with_same_order_of_fields() -> None:

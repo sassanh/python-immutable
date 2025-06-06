@@ -1,7 +1,7 @@
 # ruff: noqa: D100, D101, D102, D103, D104, D107
 from typing import Callable
 
-from immutable.main import Immutable
+from immutable import Immutable
 
 
 def test_replace_with_call() -> None:

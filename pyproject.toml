@@ -29,7 +29,7 @@ packages = ["immutable"]
 [tool.uv]
 dev-dependencies = [
   "poethepoet>=0.24.4",
-  "pyright>=1.1.400",
+  "pyright>=1.1.401",
   "pytest>=8.0.0",
   "pytest-cov>=4.1.0",
   "pytest-timeout>=2.3.1",

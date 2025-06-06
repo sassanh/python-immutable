@@ -1,5 +1,9 @@
 # Changelog
 
+## Upcoming
+
+- refactor: make it play nicer with pyright's `reportUnhashable`
+
 ## Version 1.2.0
 
 - chore: replace poetry with uv, make sure python3.9+ is supported and add tests for all supported python versions in github actions

@@ -1,5 +1,5 @@
 # ruff: noqa: D100, D101, D102, D103, D104, D107
-from immutable.main import Immutable, immutable, is_immutable
+from immutable import Immutable, immutable, is_immutable
 
 
 def test_sub_classes() -> None:

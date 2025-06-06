@@ -19,6 +19,12 @@ robustness and clarity of your data structures.
 pip install python-immutable
 ```
 
+### uv
+
+```bash
+uv add python-immutable
+```
+
 ### Poetry
 
 ```bash
