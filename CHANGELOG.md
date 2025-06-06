@@ -1,6 +1,6 @@
 # Changelog
 
-## Upcoming
+## Version 1.2.1
 
 - refactor: make it play nicer with pyright's `reportUnhashable`
 - chore: update setup-uv version in github actions to v6 to support `python-version` parameter
